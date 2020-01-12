@@ -1,0 +1,69 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_start_repo/bloc/authentication/bloc.dart';
+import 'package:flutter_start_repo/repository/UserRepository.dart';
+import 'package:flutter_start_repo/repository/dio_helper.dart';
+import 'package:flutter_start_repo/ui/extra/loading.dart';
+import 'package:flutter_start_repo/ui/home/home_screen.dart';
+import 'package:flutter_start_repo/ui/login/login_screen.dart';
+import 'package:flutter_start_repo/ui/screen/splash_screen.dart';
+import 'package:flutter_start_repo/utils/color.dart';
+import 'package:flutter_start_repo/utils/router.dart';
+import 'package:flutter_start_repo/utils/simple_bloc_delegate.dart';
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  BlocSupervisor.delegate = SimpleBlocDelegate();
+  final userRepository = UserRepository();
+  runApp(
+    BlocProvider<AuthenticationBloc>(
+      create: (context) {
+        return AuthenticationBloc(userRepository: userRepository)
+          ..add(AppStarted());
+      },
+      child: MyApp(userRepository: userRepository),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  final UserRepository userRepository;
+
+  const MyApp({Key key, this.userRepository}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Book Doctor',
+      theme: ThemeData(
+          fontFamily: 'Avenir',
+          textTheme: TextTheme(
+              body1: TextStyle(color: CustomColor.DEFAULT_TEXT_COLOR),
+              body2: TextStyle(
+                color: CustomColor.DEFAULT_TEXT_COLOR,
+                fontSize: 15,
+              ),
+              title: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+          primaryColor: CustomColor.PRIMARY_COLOR,
+          accentColor: CustomColor.ACCENT_COLOR,
+          appBarTheme: AppBarTheme(
+              brightness: Brightness.dark,
+              iconTheme: IconThemeData(color: Colors.white))),
+      onGenerateRoute: (settings) => Router.onGenerateRoute(settings),
+      home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+        builder: (context, state) {
+          if (state is AuthenticationAuthenticated) {
+            return HomeScreen();
+          }
+          if (state is AuthenticationUnauthenticated) {
+            return LoginScreen(userRepository: userRepository);
+          }
+          if (state is AuthenticationLoading) {
+            return LoadingIndicator();
+          }
+          return SplashScreen();
+        },
+      ),
+    );
+  }
+}
