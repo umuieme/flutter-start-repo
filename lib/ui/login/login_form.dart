@@ -1,12 +1,14 @@
-import 'package:flutter_start_repo/bloc/login/bloc.dart';
-import 'package:flutter_start_repo/ui/extra/loading.dart';
-import 'package:flutter_start_repo/utils/color.dart';
-import 'package:flutter_start_repo/utils/router.dart';
-import 'package:flutter_start_repo/utils/validator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_start_repo/bloc/login/bloc.dart';
+import 'package:flutter_start_repo/ui/extra/button.dart';
+import 'package:flutter_start_repo/ui/extra/loading.dart';
+import 'package:flutter_start_repo/utils/color.dart';
+import 'package:flutter_start_repo/utils/router.dart';
+import 'package:flutter_start_repo/utils/ui_helper.dart';
+import 'package:flutter_start_repo/utils/validator.dart';
 
 class LoginForm extends StatefulWidget {
   @override
@@ -50,12 +52,7 @@ class _LoginFormState extends State<LoginForm> {
           child: BlocListener<LoginBloc, LoginState>(
             listener: (context, state) {
               if (state is LoginFailure) {
-                Scaffold.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${state.error}'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                UiHelper.showSnackBar(context, state.error, isError: true);
               }
             },
             child: BlocBuilder<LoginBloc, LoginState>(
@@ -72,22 +69,13 @@ class _LoginFormState extends State<LoginForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SizedBox(
-          height: 64,
-        ),
-        FlutterLogo(
-          size: 128,
-        ),
-        SizedBox(
-          height: 64,
-        ),
         TextFormField(
           style: TextStyle(fontSize: 16),
           decoration:
               InputDecoration(hintText: "Username", labelText: "Username"),
           validator: (value) => Validator.validateEmail(value),
           onSaved: (value) => _email = value,
-          initialValue: kDebugMode ? 'admin' : '',
+          initialValue: kDebugMode ? 'admin@admin.com' : '',
         ),
         SizedBox(
           height: 32,
@@ -105,24 +93,22 @@ class _LoginFormState extends State<LoginForm> {
         ),
         Align(
             alignment: Alignment.centerRight,
-            child: Text(
-              "Forgot your password?",
-              style: TextStyle(color: theme.primaryColor),
+            child: InkWell(
+              onTap: this._onForgetPasswordPressed,
+              child: Text(
+                "Forgot your password?",
+                style: TextStyle(color: theme.primaryColor),
+              ),
             )),
         SizedBox(
           height: 32,
         ),
         state is LoginLoading
             ? LoadingIndicator()
-            : RaisedButton(
+            : Button(
                 onPressed: () => this._onSignInPress(),
-                child: Text("SIGN IN"),
-                color: theme.accentColor,
-                elevation: 0,
-                textColor: Colors.white,
+                title: "SIGN IN",
                 padding: EdgeInsets.all(20),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
               ),
         SizedBox(
           height: 32,
