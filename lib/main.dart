@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_start_repo/bloc/authentication/bloc.dart';
 import 'package:flutter_start_repo/repository/UserRepository.dart';
-import 'package:flutter_start_repo/repository/dio_helper.dart';
 import 'package:flutter_start_repo/ui/extra/loading.dart';
 import 'package:flutter_start_repo/ui/home/home_screen.dart';
 import 'package:flutter_start_repo/ui/login/login_screen.dart';
@@ -15,15 +14,18 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   BlocSupervisor.delegate = SimpleBlocDelegate();
   final userRepository = UserRepository();
-  runApp(
-    BlocProvider<AuthenticationBloc>(
+  runApp(MultiRepositoryProvider(
+    providers: [
+      RepositoryProvider<UserRepository>(create: (context) => userRepository)
+    ],
+    child: BlocProvider<AuthenticationBloc>(
       create: (context) {
         return AuthenticationBloc(userRepository: userRepository)
           ..add(AppStarted());
       },
       child: MyApp(userRepository: userRepository),
     ),
-  );
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -38,12 +40,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
           fontFamily: 'Avenir',
           textTheme: TextTheme(
-              body1: TextStyle(color: CustomColor.DEFAULT_TEXT_COLOR),
-              body2: TextStyle(
+              bodyText1: TextStyle(color: CustomColor.DEFAULT_TEXT_COLOR),
+              bodyText2: TextStyle(
                 color: CustomColor.DEFAULT_TEXT_COLOR,
                 fontSize: 15,
               ),
-              title: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+              headline6: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
           primaryColor: CustomColor.PRIMARY_COLOR,
           accentColor: CustomColor.ACCENT_COLOR,
           appBarTheme: AppBarTheme(
@@ -57,6 +59,7 @@ class MyApp extends StatelessWidget {
           }
           if (state is AuthenticationUnauthenticated) {
             return LoginScreen(userRepository: userRepository);
+            // return RegisterScreen();
           }
           if (state is AuthenticationLoading) {
             return LoadingIndicator();

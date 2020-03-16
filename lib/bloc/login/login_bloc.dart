@@ -1,11 +1,13 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart';
+import 'package:bloc/bloc.dart';
 import 'package:flutter_start_repo/bloc/authentication/bloc.dart';
 import 'package:flutter_start_repo/bloc/login/bloc.dart';
 import 'package:flutter_start_repo/repository/UserRepository.dart';
+import 'package:flutter_start_repo/utils/error_helper.dart';
 import 'package:meta/meta.dart';
-import 'package:bloc/bloc.dart';
+
+import 'bloc.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final UserRepository userRepository;
@@ -33,11 +35,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         authenticationBloc.add(LoggedIn(user: userInfo));
       } catch (error) {
         print(error);
-        if (error is DioError) {
-          yield LoginFailure(error: error.response.data['message']);
-          return;
-        }
-        yield LoginFailure(error: error.toString());
+        yield LoginFailure(error: ErrorHelper.getErrorMessage(error));
       }
     }
   }

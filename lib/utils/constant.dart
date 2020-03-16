@@ -4,6 +4,8 @@ class Preference {
 
 class Api {
   static const BASE_URL = "";
+  static const LOGIN = "/login";
+  static const REGISTER = "/register";
 }
 
 class Font {
