@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_start_repo/bloc/register/register_bloc.dart';
-import 'package:flutter_start_repo/bloc/register/register_event.dart';
 import 'package:flutter_start_repo/bloc/register/register_state.dart';
 import 'package:flutter_start_repo/ui/extra/button.dart';
 import 'package:flutter_start_repo/ui/extra/loading.dart';
@@ -18,7 +17,7 @@ class _RegisterFormState extends State<RegisterForm> {
   _onRegisterUser() {
     if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
-    BlocProvider.of<RegisterBloc>(context).add(RegisterUserEvent());
+    BlocProvider.of<RegisterBloc>(context).registerUser();
   }
 
   @override
