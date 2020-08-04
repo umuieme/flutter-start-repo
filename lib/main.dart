@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_start_repo/bloc/authentication/bloc.dart';
 import 'package:flutter_start_repo/repository/UserRepository.dart';
 import 'package:flutter_start_repo/ui/extra/loading.dart';
@@ -12,7 +13,7 @@ import 'package:flutter_start_repo/utils/simple_bloc_delegate.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  BlocSupervisor.delegate = SimpleBlocDelegate();
+  Bloc.observer = SimpleBlocObserver();
   final userRepository = UserRepository();
   runApp(MultiRepositoryProvider(
     providers: [
@@ -20,8 +21,7 @@ void main() {
     ],
     child: BlocProvider<AuthenticationBloc>(
       create: (context) {
-        return AuthenticationBloc(userRepository: userRepository)
-          ..add(AppStarted());
+        return AuthenticationBloc(userRepository: userRepository);
       },
       child: MyApp(userRepository: userRepository),
     ),

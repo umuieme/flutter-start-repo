@@ -25,12 +25,7 @@ class _LoginFormState extends State<LoginForm> {
     if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
     print('email $_email password $_password');
-    BlocProvider.of<LoginBloc>(context).add(
-      LoginButtonPressed(
-        username: _email,
-        password: _password,
-      ),
-    );
+    BlocProvider.of<LoginBloc>(context).loginButtonPressed(_email, _password);
   }
 
   _onSignInWithFacebook() {
